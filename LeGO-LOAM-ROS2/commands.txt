@@ -1,0 +1,7 @@
+export ROS_DOMAIN_ID=86
+source /galactic/opt/ros/setup.bash 
+source install/setup.bash 
+ros2 launch lego_loam_sr run.launch.py
+sudo apt-get install ros-galactic-rosbag2-storage-mcap
+ros2 bag play racecar_ros2bags/rosbag2_2024_10_11-15_46_38_filtered_0.mcap --storage mcap --remap /luminar_front/points:=/velodyne_points --rate 0.1 \
+ros2 bag play racecar_ros2bags/rosbag2_2024_10_11-15_46_38_filtered_0.mcap --storage mcap --topics /luminar_front/points --remap /luminar_front/points:=/velodyne_points --rate 0.1 \
