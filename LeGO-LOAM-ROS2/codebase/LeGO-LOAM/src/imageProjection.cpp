@@ -28,6 +28,7 @@
 
 #include <boost/circular_buffer.hpp>
 #include "imageProjection.h"
+#include "rclcpp/qos.hpp"
 
 const std::string PARAM_VERTICAL_SCANS = "laser.num_vertical_scans";
 const std::string PARAM_HORIZONTAL_SCANS = "laser.num_horizontal_scans";
@@ -42,8 +43,11 @@ const std::string PARAM_SEGMENT_LINE = "image_projection.segment_valid_line_num"
 ImageProjection::ImageProjection(const std::string &name, Channel<ProjectionOut>& output_channel)
     : Node(name),  _output_channel(output_channel)
 {
+
+  rclcpp::QoS qos_profile(10);
+  qos_profile.best_effort();
   _sub_laser_cloud = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "/lidar_points", 1, std::bind(&ImageProjection::cloudHandler, this, std::placeholders::_1));
+      "/lidar_points", qos_profile, std::bind(&ImageProjection::cloudHandler, this, std::placeholders::_1));
 
   _pub_full_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/full_cloud_projected", 1);
   _pub_full_info_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/full_cloud_info", 1);
