@@ -27,6 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/circular_buffer.hpp>
+#include <stdio.h>
 #include "imageProjection.h"
 #include "rclcpp/qos.hpp"
 
@@ -182,6 +183,8 @@ void ImageProjection::cloudHandler(
 void ImageProjection::projectPointCloud() {
   // range image projection
   const size_t cloudSize = _laser_cloud_in->points.size();
+  float lowestAngle = 0.0;
+  float highestAngle = 0.0;
 
   for (size_t i = 0; i < cloudSize; ++i) {
     PointType thisPoint = _laser_cloud_in->points[i];
@@ -193,6 +196,14 @@ void ImageProjection::projectPointCloud() {
     // find the row and column index in the image for this point
     float verticalAngle = std::asin(thisPoint.z / range);
         //std::atan2(thisPoint.z, sqrt(thisPoint.x * thisPoint.x + thisPoint.y * thisPoint.y));
+    
+    if (verticalAngle < lowestAngle) {
+        //RCLCPP_INFO_STREAM(this->get_logger(), "Vert Angle" << verticalAngle);
+	lowestAngle = verticalAngle;
+    }
+    if (verticalAngle > highestAngle) { 
+	highestAngle = verticalAngle;
+    }
 
     int rowIdn = (verticalAngle + _ang_bottom) / _ang_resolution_Y;
     if (rowIdn < 0 || rowIdn >= _vertical_scans) {
@@ -225,6 +236,8 @@ void ImageProjection::projectPointCloud() {
     _full_info_cloud->points[index] = thisPoint;
     _full_info_cloud->points[index].intensity = range;
   }
+  //RCLCPP_INFO_STREAM(this->get_logger(), "Lowest Angle" << lowestAngle);
+  //RCLCPP_INFO_STREAM(this->get_logger(), "Highest Angle" << highestAngle);
 }
 
 void ImageProjection::findStartEndAngle() {

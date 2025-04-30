@@ -40,23 +40,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update \
-    && apt-get install -y vim tmux ros-galactic-rviz2 ros-galactic-rosbag2-storage-mcap \
+    && apt-get install -y vim tmux ros-galactic-rviz2 ros-galactic-rosbag2-storage-mcap ros-galactic-sensor-msgs-py \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update \
     && apt-get install -y x11-apps x11-utils x11-xserver-utils
 
-# Clone LeGO-LOAM-ROS2 and build
-RUN mkdir -p /root/dev_ws/src && \
-    cd /root/dev_ws/src && \
-    git clone https://github.com/RajathCA/SLAM-Racecar.git && \
-    mv SLAM-Racecar/LeGO-LOAM-ROS2/codebase ./LeGO-LOAM-ROS2 && \
-    rm -rf SLAM-Racecar
-
-# Build workspace
-RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
-    cd /root/dev_ws && \
-    colcon build"
+# Make sure the workspace src exists
+RUN mkdir -p /root/dev_ws/src
 
 # Set working directory and default shell
 WORKDIR /root/dev_ws
