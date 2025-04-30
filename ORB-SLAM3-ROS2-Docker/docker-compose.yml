@@ -1,0 +1,41 @@
+version: "3"
+services:
+  orb_slam3_22_humble:
+    image: orb-slam3-humble:22.04
+    # user: "${MY_UID}:${MY_GID}"
+    volumes:
+      #full dev
+      - /dev:/dev:rw
+      #full media
+      - /media:/media:rw
+      #Time
+      - /etc/timezone:/etc/timezone:rw
+      - /etc/localtime:/etc/localtime:rw
+      #ros-workspaces
+      - ./container_root/:/root/
+      - ./ORB_SLAM3/:/home/orb/ORB_SLAM3/
+      - ./ros_env_vars.sh:/root/ros_env_vars.sh
+      - ./orb_slam3_ros2_wrapper/:/root/colcon_ws/src/orb_slam3_ros2_wrapper/
+      - ./orb_slam3_map_generator/:/root/colcon_ws/src/orb_slam3_map_generator/
+      - ./slam_msgs/:/root/colcon_ws/src/slam_msgs/
+
+      # X11 forwarding
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/xauth-rysong:/tmp/xauthority:ro
+      - $HOME/.Xauthority:/root/.Xauthority:rw
+      - /mnt/rysong/slam_racecar/rosbag2_2024_10_11-15_46_38_filtered/:/root/rosbag2_2024_10_11-15_46_38_filtered/
+      - /mnt/rysong/slam_racecar/rosbag2_2024_01_06-12_52_49/:/root/slow_data
+    privileged: true
+    network_mode: host
+    ipc: host
+    pid: host
+    stdin_open: true
+    tty: true
+    environment:
+      # - DISPLAY
+      - DISPLAY=${DISPLAY}
+      - MY_UID=${MY_UID}
+      - MY_GID=${MY_GID}
+      - XAUTHORITY=/root/.Xauthority
+      - QT_X11_NO_MITSHM=1
+    entrypoint: /bin/bash
